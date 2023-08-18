@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { PaginationButton } from "../buttons/PaginationButton"
-import { CharacterCard } from "../character-search/cards/CharacterCard"
+import { CharacterCard } from "./cards/CharacterCard"
 
 import './CharacterPages.css'
 
