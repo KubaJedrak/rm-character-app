@@ -1,0 +1,34 @@
+.characters-page {
+  max-width: 80vw;
+  height: auto;
+}
+
+.characters-list {
+  padding: 0; 
+  /* required^ to deal with default inline */
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+}
+
+.characters-list__item {
+  width: 21%;
+  margin: 20px auto;
+}
+
+.characters-page__active-counter {
+  max-width: 80vw;
+}
+
+.characters-page--active-counter--text {
+  font-size: 24px;
+  text-align: right;
+  margin-right: 60px;
+}
+
+.characters-page--buttons {
+  padding: 0px 50px;
+  display: flex;
+  justify-content: space-between;
+  max-width: 80vw;
+}

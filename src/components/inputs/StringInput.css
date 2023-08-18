@@ -1,0 +1,34 @@
+.input--container {
+  width: 65%;
+  margin: 20px auto;
+}
+
+.input {
+  min-width: 300px;
+  font-family: inherit;
+  font-size: 1.3rem;
+  background: #a7a7a7;
+  width: 100%;
+  padding: 7px 0;
+  border: 2px solid var(--primary-color);
+  border-radius: 25px;
+  outline: 0;
+  color: #fff;
+  transition: border-color 0.25s;
+  text-align: center;
+}
+
+.input__label {
+  display: block;
+  font-size: 16px;
+  color: var(--tertiary-color);
+
+  display: none; 
+  /* style later^ */
+}
+
+.input:focus,
+.input:hover {
+  border-color: var(--secondary-color);
+  border-image-slice: 1;
+}
