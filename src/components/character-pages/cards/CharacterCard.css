@@ -49,6 +49,10 @@
   font-weight: 400;
 }
 
+.active {
+  border: 2px solid var(--active-color);
+}
+
 /* Tooltip */
 
 .tooltip {
@@ -68,8 +72,6 @@
 
   /* positioning */
   position: fixed;
-  /* top: 30px;
-  left: 30px; */
   z-index: 1;
 }
 
@@ -78,10 +80,7 @@
   visibility: visible;
 }
 
-.active {
-  border: 2px solid var(--active-color);
-}
-
 .tooltip--text {
   font-size: 12px;
+  margin-left: 10px;
 }

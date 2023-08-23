@@ -17,13 +17,20 @@
 }
 
 .characters-page__active-counter {
+  width: 100%;
   max-width: 80vw;
+  display: flex;
+  justify-content: space-between;
 }
 
 .characters-page--active-counter--text {
   font-size: 24px;
-  text-align: right;
   margin-right: 60px;
+}
+
+.characters-page--active-counter--page-text {
+  font-size: 24px;
+  margin-left: 60px;
 }
 
 .characters-page--buttons {

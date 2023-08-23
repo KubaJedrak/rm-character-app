@@ -6,11 +6,8 @@ type ContentParams = {
   top: string,
   left: string
 }
-type Season = string[]
 
 export const TooltipContent = ({episodeInfo, visible, left, top}: ContentParams) => {
-
-  // console.log("Episode info: ", episo  
 
   let seasons: string[][] = [[], [], [], [], [], []]
     

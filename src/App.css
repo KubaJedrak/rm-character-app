@@ -11,17 +11,6 @@
   --tertiary-color: #9B84D2;
   --shade-color: #414141;
   --active-color: #8DFCA9;
-  
-  --standard-font-size: 16px;
-  --big-font-size: 24px;
-  --small-font-size: 12px;
-
-  --standard-padding: 10px;
-  --standard-margin: 20px;
-
-  --standard-icon-size: 48px;
-  --medium-icon-size: 24px;
-  --small-icon-size: 16px;
 }
 
 .App {
