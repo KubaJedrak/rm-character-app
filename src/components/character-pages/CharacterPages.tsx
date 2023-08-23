@@ -23,7 +23,7 @@ export const CharacterPages = () => {
   const [ready, setReady] = useState(false)
   const [error, setError] = useState("")
   const [pagesTotal, setPagesTotal] = useState<number>()
-  const [searchByNameValue, setSearchByNameValue] = useState<any>()
+  const [searchByNameValue, setSearchByNameValue] = useState<string>()
   const [isSearchBarActive, setIsSearchBarActive] = useState<boolean>(false)
   const [isSearchReady, setIsSearchReady] = useState(false)
 
@@ -38,18 +38,11 @@ export const CharacterPages = () => {
     setSearchByNameValue(searchValue)
   }
 
-  const handleKeyDown = (e: any): void => {
+  const handleEnterKeyDown = (e: any): void => {
     if (e.key === "Enter") {
-      console.log(searchByNameValue);
-      console.log(e.key);
       setIsSearchReady(true)
     }
   }
-
-  useEffect(() => { // to remove
-    console.log(`searchByNameValue: ${searchByNameValue}`);
-    
-  }, [searchByNameValue])
 
   const updateActiveCardsFunc = (isActive: boolean): void => {     // some bug here on backing up??
     if (isActive) setActiveCards(activeCards+1)
@@ -68,7 +61,6 @@ export const CharacterPages = () => {
       if (Number(match[1]) !== 1) {
         fetchWithQuery(nextPage)
         setCurrentPage(currentPage+1)
-        console.log(nextPage);
       } 
     }    
   }
@@ -96,11 +88,10 @@ export const CharacterPages = () => {
   // --- Search Bar trigger effect: ---
   useEffect( () => {
     if (isSearchReady) {
-      fetchWithQuery(`https://rickandmortyapi.com/api/character/?name=${searchByNameValue}`)   
-      console.log('ping issearchready');
-    }
-
-    
+      fetchWithQuery(`https://rickandmortyapi.com/api/character/?name=${searchByNameValue}`)
+      setIsSearchReady(false)
+      setSearchByNameValue("")
+    }    
   }, [isSearchReady])
 
   // --- First API call after website loads ---
@@ -111,7 +102,7 @@ export const CharacterPages = () => {
 
   return(
     <div className="container characters-page--container">
-      <CharacterSearch handleKeyDown={handleKeyDown} handleUpdateSearchValue={handleUpdateSearchValue} />
+      <CharacterSearch handleEnterKeyDown={handleEnterKeyDown} handleUpdateSearchValue={handleUpdateSearchValue} />
       {ready && <>
         <div className="characters-page__active-counter">
           <p className="characters-page--active-counter--page-text">Page: {currentPage}</p>

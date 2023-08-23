@@ -3,10 +3,10 @@ import { StringInput } from "../inputs/StringInput"
 
 type SearchFunction = {
   handleUpdateSearchValue: (searchValue: string) => void,
-  handleKeyDown: (e: any) => void
+  handleEnterKeyDown: (e: any) => void
 }
 
-export const CharacterSearch = ({handleUpdateSearchValue, handleKeyDown}: SearchFunction) => {
+export const CharacterSearch = ({handleUpdateSearchValue, handleEnterKeyDown}: SearchFunction) => {
 
   const [searchValue, setSearchValue] = useState("")
 
@@ -21,7 +21,7 @@ export const CharacterSearch = ({handleUpdateSearchValue, handleKeyDown}: Search
   }, [searchValue])
 
   return (
-    <div className="container characters-search" onKeyDown={handleKeyDown}>
+    <div className="container characters-search" onKeyDown={handleEnterKeyDown}>
       <StringInput 
         value={searchValue}
         placeholder="Find character"
