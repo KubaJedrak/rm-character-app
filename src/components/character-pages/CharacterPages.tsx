@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { PaginationButton } from "../buttons/PaginationButton"
 import { CharacterCard } from "./cards/CharacterCard"
 import { CharacterSearch } from "../character-search/CharacterSearch"
@@ -27,9 +27,10 @@ export const CharacterPages = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const nameSearchParam: string = urlParams.get('name') ?? "";
   const pageSearchParam: string = urlParams.get('page') ?? ""
- 
 
   // --- FUNCTIONS: --- 
+
+  // --- Searchbar functions: ---
   const handleUpdateSearchValue = (searchValue: string) => {
     setSearchByNameValue(searchValue)
   }
@@ -40,6 +41,7 @@ export const CharacterPages = () => {
     }
   }
 
+  // --- Card Active State functions: ---
   const updateActiveCardsFunc = (isActive: boolean, listKey: number): void => {     // some bug here on backing up??
     if (isActive) {
       setActiveCards([...activeCards, listKey])
@@ -47,12 +49,13 @@ export const CharacterPages = () => {
     if (!isActive) setActiveCards(activeCards.filter((card) => card !== listKey))  
   }
 
-  // reset active cards
   const resetActiveCards = () => {
+    setCurrentPage(1)
     setActiveCards([])
     setCharacters([])
   }
 
+  // --- Pagination functions: ---
   const turnPageBack = (): void => {
     resetActiveCards()
     fetchWithQuery(previousPage)    
@@ -71,6 +74,7 @@ export const CharacterPages = () => {
     }    
   }
 
+  // --- Fetch function: ---
   const fetchWithQuery = async(replacementURL?: string) => {
     let url = replacementURL ? replacementURL : `https://rickandmortyapi.com/api/character/?name=${nameSearchParam}&page=${pageSearchParam}`
     let query: string = `${url}`
@@ -93,6 +97,7 @@ export const CharacterPages = () => {
   // --- Search Bar trigger effect: ---
   useEffect( () => {
     if (isSearchReady) {
+      resetActiveCards()
       fetchWithQuery(`https://rickandmortyapi.com/api/character/?name=${searchByNameValue}`)
       setIsSearchReady(false)
       setSearchByNameValue("")

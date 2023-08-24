@@ -1,63 +1,33 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { createPortal } from 'react-dom';
 import { TooltipContent } from "./TooltipContent"
 import './CharacterCard.css'
 
 type CharacterData = {
-  character: any, //because I CAN! >.>       (or can I interface?)
+  character: any,
   handleActiveCard: (isActive: boolean, listKey: number) => void,
   listKey: number,
 }
+
+type EpisodeIDs = string[]
 
 export const CharacterCard = ({character, handleActiveCard, listKey}: CharacterData) => {
 
   const [isActive, setIsActive] = useState(false)
   const [containerClass, setContainerClass] = useState("")
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
+  const [episodeIDs, setEpisodeIDs] = useState<EpisodeIDs>([])
   const {id, image, name, status, episode: episodes} = character
-
   const regex = /[a-zA-Z0-9._%+-]+\/(\d+)$/
-  let episodeIDs: string[] = []
 
   episodes.forEach( (episode: string) => {
-    const match = episode.match(regex)
+    const match = episode.match(regex)   
     
     if (match) {
-      const episodeID = match[1]           
-      episodeIDs.push(episodeID)
-    }
+      const episodeID = match[1]   
+      if (!episodeIDs.includes(episodeID)) episodeIDs.push(episodeID)     
+    }    
   })
-
-  // --- TOOLTIP: ---
-
-  let seasons: string[][] = [[], [], [], [], [], []]
-
-  episodeIDs.forEach( (episode: string) => {
-    if (Number(episode) >= 0 && Number(episode) <= 11) {
-      seasons[0].push(episode)
-    }
-    if (Number(episode) >= 12 && Number(episode) <= 21) {
-      seasons[1].push(episode)
-    }
-    if (Number(episode) >= 22 && Number(episode) <= 31) {
-      seasons[2].push(episode)
-    }
-    if (Number(episode) >= 32 && Number(episode) <= 41) {
-      seasons[3].push(episode)
-    }
-    if (Number(episode) >= 42 && Number(episode) <= 51) {
-      seasons[4].push(episode)
-    }
-    if (Number(episode) > 52) {
-      seasons[5].push(episode)
-    }
-  })
-
-  seasons.forEach((season: string[], i: number): void => {
-    season.forEach((episode: string, i: number, season: string[]): void => {
-      season[i] = "Episode " + season[i]
-    })
-  })   
 
   // ----- FUNCTIONS: -----
 
@@ -77,6 +47,7 @@ export const CharacterCard = ({character, handleActiveCard, listKey}: CharacterD
     setIsActive(!isActive)
   }
 
+  //   -- Card Active CSS trigger & Active Count (in Pages) update --
   useEffect( () => {
     if (isActive) { 
       setContainerClass("card characters-page__card active")
@@ -86,7 +57,7 @@ export const CharacterCard = ({character, handleActiveCard, listKey}: CharacterD
       handleActiveCard(isActive, listKey)
     }
   }, [isActive])
-  
+
   return(
     <div className={containerClass} onClick={handleCardClick}>
       <div className="card__image--container">
@@ -106,14 +77,14 @@ export const CharacterCard = ({character, handleActiveCard, listKey}: CharacterD
           >{episodes.length}</a>
           {createPortal(
           <TooltipContent 
-            episodeInfo={episodeIDs} 
+            episodeIDs={episodeIDs}
             visible={isTooltipVisible} 
             top="30px"
             left="30px"
+            name={name}
           />, document.body, id)}
         </div>
       </div>
-      
     </div>
   )
 }

@@ -1,62 +1,95 @@
+import { useState, useEffect } from 'react'
 import './CharacterCard.css'
 
 type ContentParams = {
-  episodeInfo: string[],
+  episodeIDs: string[],
   visible: boolean,
   top: string,
-  left: string
+  left: string,
+  name?: string
 }
 
-export const TooltipContent = ({episodeInfo, visible, left, top}: ContentParams) => {
+type SeasonObject = {season: string, seasonalEpisodes: string[]}
 
-  let seasons: string[][] = [[], [], [], [], [], []]
+export const TooltipContent = ({episodeIDs, visible, left, top, name}: ContentParams) => {
+
+  const [error, setError] = useState<any>(null)
+  const [tooltipData, setTooltipData] = useState<Array<SeasonObject>>([
+    {season: "01", seasonalEpisodes: []}, {season: "02", seasonalEpisodes: []}, {season: "03", seasonalEpisodes: []}, {season: "04", seasonalEpisodes: []}, {season: "05", seasonalEpisodes: []}, {season: "06", seasonalEpisodes: []}
+  ])
+  const [dataReady, setDataReady] = useState(false)
+  
+  const fetchEpisodes = async() => {
+    const response = await fetch(`https://rickandmortyapi.com/api/episode/${episodeIDs}`)
+    const data = await response.json()
+
+    let episodes: string[] = []
     
-  episodeInfo.forEach( (episode) => {
-    if (Number(episode) >= 0 && Number(episode) <= 11) {
-      seasons[0].push(episode)
+    if (Array.isArray(data)) {
+      data.forEach(episode => {
+        episodes.push(episode.episode);        
+      })
+    } else {
+      episodes = [data.episode]
     }
-    if (Number(episode) >= 12 && Number(episode) <= 21) {
-      seasons[1].push(episode)
-    }
-    if (Number(episode) >= 22 && Number(episode) <= 31) {
-      seasons[2].push(episode)
-    }
-    if (Number(episode) >= 32 && Number(episode) <= 41) {
-      seasons[3].push(episode)
-    }
-    if (Number(episode) >= 42 && Number(episode) <= 51) {
-      seasons[4].push(episode)
-    }
-    if (Number(episode) > 52) {
-      seasons[5].push(episode)
-    }
-  })
 
-  seasons.forEach((season: string[], i: number): void => {
-    season.forEach((episode: string, i: number, season: string[]): void => {
-      season[i] = "Episode " + season[i]
-    })
-  }) 
+    let tempArray: Array<SeasonObject> = [
+      {season: "01", seasonalEpisodes: []},
+      {season: "02", seasonalEpisodes: []}, 
+      {season: "03", seasonalEpisodes: []}, 
+      {season: "04", seasonalEpisodes: []}, 
+      {season: "05", seasonalEpisodes: []}, 
+      {season: "06", seasonalEpisodes: []}
+    ]
+
+    episodes.forEach((episode) => {      
+      const regex = /S(\d+)E(\d+)/
+      const match = episode.match(regex)
+
+      if (match) {        
+        const season = match[1]        
+        const episodeNumber = match[2]      
+      
+        tempArray.forEach( entry => {          
+          if (entry.season === season) {            
+            if (!entry.seasonalEpisodes.includes(episodeNumber)) entry.seasonalEpisodes.push(episodeNumber) // why did it keep doubling it?!
+          }
+        })
+      }
+    })   
+
+    if (data.error) {
+      setError(data.error)
+      return
+    }
+
+    setTooltipData(tempArray)
+  } 
+
+  useEffect(() => {
+    fetchEpisodes()
+    setDataReady(true)
+  }, [])
+
 
   return(
     <div 
       className={`tooltip--container ${visible ? "visible" : ""}`}
       style={{top: `${top}`, left: `${left}`}}
     >
-      {seasons.map( (season: string[], id: number): any => {
-        if (season.length > 0) {
-          return (
-            <div key={id}>
-              <h4>{`Season ${id+1}`}</h4>
-              {season.map( (episode: string, id: number): any => {                
-                return(
-                  <p className="tooltip--text" key={id}>{episode}</p>
-                )
-              })}
-            </div>
-          )
-        }
-      })}
+      {dataReady && <>
+        { tooltipData.map( (season, id): any => {
+          if (season.seasonalEpisodes.length > 0) {
+            return(
+              <div key={id}>
+                <p>Season {season.season}</p>
+                <p className="tooltip--text">Episodes: {season.seasonalEpisodes.join(', ')}</p>
+              </div>
+            )
+          }
+        })}
+        {error && <p>Sorry, couldn't access this information</p>}
+      </>}
     </div>
   )
 }
