@@ -1,24 +1,20 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { createPortal } from 'react-dom';
-
-import './CharacterCard.css'
 import { TooltipContent } from "./TooltipContent"
-import { isVisible } from "@testing-library/user-event/dist/utils";
-
+import './CharacterCard.css'
 
 type CharacterData = {
   character: any, //because I CAN! >.>       (or can I interface?)
-  activeCardTallyFunction: (isActive: boolean) => void
+  handleActiveCard: (isActive: boolean, listKey: number) => void,
+  listKey: number,
 }
 
-type Season = string[]
-
-export const CharacterCard = ({character, activeCardTallyFunction}: CharacterData) => {
+export const CharacterCard = ({character, handleActiveCard, listKey}: CharacterData) => {
 
   const [isActive, setIsActive] = useState(false)
   const [containerClass, setContainerClass] = useState("")
-  const [isVisible, setIsVisible] = useState(false)
-  const {id, image, name, status, episode: episodes} = character 
+  const [isTooltipVisible, setIsTooltipVisible] = useState(false)
+  const {id, image, name, status, episode: episodes} = character
 
   const regex = /[a-zA-Z0-9._%+-]+\/(\d+)$/
   let episodeIDs: string[] = []
@@ -63,53 +59,33 @@ export const CharacterCard = ({character, activeCardTallyFunction}: CharacterDat
     })
   })   
 
-  const content = (
-    <div id="tooltip--container">
-      {seasons.map( (season: string[], id: number): any => {
-        if (season.length > 0) {
-          return (
-            <div key={id}>
-              <h4>{`Season ${id+1}`}</h4>
-              {season.map( (episode: string, id: number): any => {                
-                return(
-                  <p className="tooltip--text" key={id}>{episode}</p>
-                )
-              })}
-            </div>
-          )
-        }
-      })}
-    </div>
-  )
+  // ----- FUNCTIONS: -----
 
-  // --- FUNCTIONS: ---
+  // --- Tooltip Funcs: ---
+  const handleMouseOver = (element: any): void => {
+    setIsTooltipVisible(true)
+    // const rect = element.getBoundingClientRect()
+    // console.log(rect); 
+  }
 
+  const handleMouseOut = (): void => {
+    setIsTooltipVisible(false)
+  }
+
+  // --- Card Active Funcs: ---
   const handleCardClick = (): void => {
     setIsActive(!isActive)
   }
 
-  const handleMouseOver = (element: any): void => {
-    setIsVisible(true)
-    // const rect = element.getBoundingClientRect()
-    // console.log(rect);
-    
-  }
-
-  const handleMouseOut = (): void => {
-    setIsVisible(false)
-  }
-
   useEffect( () => {
-    if (isActive) {
+    if (isActive) { 
       setContainerClass("card characters-page__card active")
-      activeCardTallyFunction(isActive)
+      handleActiveCard(isActive, listKey)
     } else {
       setContainerClass("card characters-page__card")
-      activeCardTallyFunction(isActive)
+      handleActiveCard(isActive, listKey)
     }
   }, [isActive])
-
-
   
   return(
     <div className={containerClass} onClick={handleCardClick}>
@@ -131,7 +107,7 @@ export const CharacterCard = ({character, activeCardTallyFunction}: CharacterDat
           {createPortal(
           <TooltipContent 
             episodeInfo={episodeIDs} 
-            visible={isVisible} 
+            visible={isTooltipVisible} 
             top="30px"
             left="30px"
           />, document.body, id)}

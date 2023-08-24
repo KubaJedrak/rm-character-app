@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { PaginationButton } from "../buttons/PaginationButton"
 import { CharacterCard } from "./cards/CharacterCard"
 import { CharacterSearch } from "../character-search/CharacterSearch"
@@ -14,17 +14,14 @@ type Info = {
 export const CharacterPages = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1) // starts at 1
-  const [activeCards, setActiveCards] = useState(1) // setting it to 1 balances the initial (-1) update to state in CharacterCard
-  // const [activeCardsArray, setActiveCardsArray] = useState([])  // TO-DO, add 'number' to the other state
+  const [activeCards, setActiveCards] = useState<number[]>([]) 
   const [characters, setCharacters] = useState([])
   const [info, setInfo] = useState<Info>()
   const [previousPage, setPreviousPage] = useState<string>("")
   const [nextPage, setNextPage] = useState<string>("")
   const [ready, setReady] = useState(false)
   const [error, setError] = useState("")
-  const [pagesTotal, setPagesTotal] = useState<number>()
   const [searchByNameValue, setSearchByNameValue] = useState<string>()
-  const [isSearchBarActive, setIsSearchBarActive] = useState<boolean>(false)
   const [isSearchReady, setIsSearchReady] = useState(false)
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -33,7 +30,6 @@ export const CharacterPages = () => {
  
 
   // --- FUNCTIONS: --- 
-
   const handleUpdateSearchValue = (searchValue: string) => {
     setSearchByNameValue(searchValue)
   }
@@ -44,17 +40,27 @@ export const CharacterPages = () => {
     }
   }
 
-  const updateActiveCardsFunc = (isActive: boolean): void => {     // some bug here on backing up??
-    if (isActive) setActiveCards(activeCards+1)
-    if (!isActive) setActiveCards(activeCards-1)  
+  const updateActiveCardsFunc = (isActive: boolean, listKey: number): void => {     // some bug here on backing up??
+    if (isActive) {
+      setActiveCards([...activeCards, listKey])
+    }
+    if (!isActive) setActiveCards(activeCards.filter((card) => card !== listKey))  
+  }
+
+  // reset active cards
+  const resetActiveCards = () => {
+    setActiveCards([])
+    setCharacters([])
   }
 
   const turnPageBack = (): void => {
+    resetActiveCards()
     fetchWithQuery(previousPage)    
     if (currentPage > 1) setCurrentPage(currentPage-1)
   }
 
   const turnPageNext = (): void => {
+    resetActiveCards()
     const regex = /page=(\d+)/;
     const match = nextPage.match(regex)
     if (match) {
@@ -80,8 +86,7 @@ export const CharacterPages = () => {
     setInfo(data.info)
     setCharacters(data.results)
     setPreviousPage(data.info.prev ?? "")  
-    setNextPage(data.info.next ?? "")      
-    setPagesTotal(data.info.pages)
+    setNextPage(data.info.next ?? "")
     setReady(true) 
   }
 
@@ -106,14 +111,14 @@ export const CharacterPages = () => {
       {ready && <>
         <div className="characters-page__active-counter">
           <p className="characters-page--active-counter--page-text">Page: {currentPage}</p>
-          <p className="characters-page--active-counter--text">Cards active: <span>{activeCards}</span></p>
+          <p className="characters-page--active-counter--text">Cards active: <span>{activeCards.length}</span></p>
         </div>
         <div className="characters-page">
           <ul className="characters-list">
             {characters.map( (character, id) => {
               return(
                 <li key={id} className="characters-list__item">
-                  <CharacterCard character={character} activeCardTallyFunction={updateActiveCardsFunc} /> 
+                  <CharacterCard character={character} handleActiveCard={updateActiveCardsFunc} listKey={id} /> 
                 </li>
               )
             })}
