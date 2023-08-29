@@ -4,29 +4,18 @@ import { CharacterCard } from "./cards/CharacterCard"
 import { CharacterSearch } from "../character-search/CharacterSearch"
 import './CharacterPages.css'
 
-type Info = {
-  count: number,
-  next: string | null,
-  pages: number,
-  prev: string | null
-}
-
 export const CharacterPages = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(1) // starts at 1
   const [activeCards, setActiveCards] = useState<number[]>([]) 
   const [characters, setCharacters] = useState([])
-  const [info, setInfo] = useState<Info>()
   const [previousPage, setPreviousPage] = useState<string>("")
   const [nextPage, setNextPage] = useState<string>("")
   const [ready, setReady] = useState(false)
   const [error, setError] = useState("")
-  const [searchByNameValue, setSearchByNameValue] = useState<string>()
+  const [searchByNameValue, setSearchByNameValue] = useState<string>("")
   const [isSearchReady, setIsSearchReady] = useState(false)
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const nameSearchParam: string = urlParams.get('name') ?? "";
-  const pageSearchParam: string = urlParams.get('page') ?? ""
+  const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search))
 
   // --- FUNCTIONS: --- 
 
@@ -37,6 +26,7 @@ export const CharacterPages = () => {
 
   const handleEnterKeyDown = (e: any): void => {
     if (e.key === "Enter") {
+      urlParams.set("name", searchByNameValue)
       setIsSearchReady(true)
     }
   }
@@ -50,16 +40,20 @@ export const CharacterPages = () => {
   }
 
   const resetActiveCards = () => {
-    setCurrentPage(1)
     setActiveCards([])
     setCharacters([])
   }
 
   // --- Pagination functions: ---
+  const setNewPage = (page: string): void => {
+    urlParams.set("page", page)
+  }
+ 
   const turnPageBack = (): void => {
     resetActiveCards()
-    fetchWithQuery(previousPage)    
-    if (currentPage > 1) setCurrentPage(currentPage-1)
+    setNewPage(String(currentPage-1))   
+    fetchWithQuery(urlParams)    
+    if (currentPage > 1) setCurrentPage(currentPage-1) // prevents going to the end of the list from page 1
   }
 
   const turnPageNext = (): void => {
@@ -67,38 +61,38 @@ export const CharacterPages = () => {
     const regex = /page=(\d+)/;
     const match = nextPage.match(regex)
     if (match) {
-      if (Number(match[1]) !== 1) {
-        fetchWithQuery(nextPage)
+      if (Number(match[1]) !== 1) { // prevents reverting back to first page from last page of the list
+        setNewPage(match[1])        
+        fetchWithQuery(urlParams)
         setCurrentPage(currentPage+1)
       } 
     }    
   }
 
   // --- Fetch function: ---
-  const fetchWithQuery = async(replacementURL?: string) => {
-    let url = replacementURL ? replacementURL : `https://rickandmortyapi.com/api/character/?name=${nameSearchParam}&page=${pageSearchParam}`
-    let query: string = `${url}`
-
-    const response = await fetch(query)
+  const fetchWithQuery = async(urlParams: any, shouldPageBeReset?: boolean) => {
+    if (shouldPageBeReset) {await urlParams.delete("page")}
+    let url = `https://rickandmortyapi.com/api/character/?${urlParams}`
+    const response = await fetch(url)
     const data = await response.json()
 
     if (data.error) {
       setError(data.error)
       return
-    }
-        
-    setInfo(data.info)
+    }    
+
     setCharacters(data.results)
     setPreviousPage(data.info.prev ?? "")  
     setNextPage(data.info.next ?? "")
-    setReady(true) 
+    setReady(true)
   }
 
   // --- Search Bar trigger effect: ---
   useEffect( () => {
     if (isSearchReady) {
       resetActiveCards()
-      fetchWithQuery(`https://rickandmortyapi.com/api/character/?name=${searchByNameValue}`)
+      fetchWithQuery(urlParams, true)
+      setCurrentPage(Number(urlParams.get("page")) || 1)
       setIsSearchReady(false)
       setSearchByNameValue("")
     }    
@@ -106,7 +100,8 @@ export const CharacterPages = () => {
 
   // --- First API call after website loads ---
   useEffect(() => {
-    fetchWithQuery()
+    setCurrentPage(Number(urlParams.get("page")) || 1)
+    fetchWithQuery(urlParams)
     setReady(true)    
   }, [])
 
@@ -127,16 +122,16 @@ export const CharacterPages = () => {
                 </li>
               )
             })}
-            {characters.length < 20 && <p>End of list - No more results available.</p>}
+            {characters.length < 20 && <p>No more results available.</p>}
           </ul>
-        </div> 
-        <div className="characters-page--buttons">
-          <PaginationButton nextPage={false} handleClick={turnPageBack} />
-          <PaginationButton nextPage={true} handleClick={turnPageNext} />
-        </div>     
+        </div>    
       </>}
       {!ready && <p>Loading...</p>}
       {error && <p>{error}</p>}
+      <div className="characters-page--buttons">
+        <PaginationButton nextPage={false} handleClick={turnPageBack} />
+        <PaginationButton nextPage={true} handleClick={turnPageNext} />
+      </div>  
     </div>
   )
 }
