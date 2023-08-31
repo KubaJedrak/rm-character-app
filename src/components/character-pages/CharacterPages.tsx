@@ -4,12 +4,15 @@ import { CharacterCard } from "./cards/CharacterCard"
 import { CharacterSearch } from "../character-search/CharacterSearch"
 import './CharacterPages.css'
 
-export const CharacterPages = () => {
+type AppBounds = {
+  appBounds: any
+}
+
+export const CharacterPages = ({appBounds}: AppBounds) => {
 
   const [currentPage, setCurrentPage] = useState<number>(1) // starts at 1
   const [activeCards, setActiveCards] = useState<number[]>([]) 
   const [characters, setCharacters] = useState([])
-  const [previousPage, setPreviousPage] = useState<string>("")
   const [nextPage, setNextPage] = useState<string>("")
   const [ready, setReady] = useState(false)
   const [error, setError] = useState("")
@@ -17,7 +20,7 @@ export const CharacterPages = () => {
   const [isSearchReady, setIsSearchReady] = useState(false)
   const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search))
 
-  // --- FUNCTIONS: --- 
+  // --- FUNCTIONS: ---  
 
   // --- Searchbar functions: ---
   const handleUpdateSearchValue = (searchValue: string) => {
@@ -33,9 +36,7 @@ export const CharacterPages = () => {
 
   // --- Card Active State functions: ---
   const updateActiveCardsFunc = (isActive: boolean, listKey: number): void => {     // some bug here on backing up??
-    if (isActive) {
-      setActiveCards([...activeCards, listKey])
-    }
+    if (isActive) setActiveCards([...activeCards, listKey])
     if (!isActive) setActiveCards(activeCards.filter((card) => card !== listKey))  
   }
 
@@ -82,7 +83,6 @@ export const CharacterPages = () => {
     }    
 
     setCharacters(data.results)
-    setPreviousPage(data.info.prev ?? "")  
     setNextPage(data.info.next ?? "")
     setReady(true)
   }
@@ -118,11 +118,16 @@ export const CharacterPages = () => {
             {characters.map( (character, id) => {
               return(
                 <li key={id} className="characters-list__item">
-                  <CharacterCard character={character} handleActiveCard={updateActiveCardsFunc} listKey={id} /> 
+                  <CharacterCard 
+                    character={character} 
+                    handleActiveCard={updateActiveCardsFunc} 
+                    listKey={id}
+                    appBounds={appBounds}
+                  /> 
                 </li>
               )
             })}
-            {characters.length < 20 && <p>No more results available.</p>}
+            {characters.length < 20 && <p style={{display: "block", width: "100%", margin: "50px"}}>No more results available.</p>}
           </ul>
         </div>    
       </>}

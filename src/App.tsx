@@ -1,11 +1,23 @@
 import { CharacterPages } from './components/character-pages/CharacterPages';
+import { useState, useEffect , useRef } from 'react';
 import './App.css';
 
 function App() {
+
+  const [appBounds, setAppBounds] = useState<DOMRect>()
+  const appRef = useRef<any>(null)
+
+  useEffect(() => {
+    setAppBounds(appRef.current.getBoundingClientRect())
+  }, [appRef])
+
   return (
-    <div className="App">
+    <div 
+      className="App"
+      ref={appRef}
+    >
       <h2>Rick & Morty Character Sheet</h2>
-      <CharacterPages />
+      <CharacterPages appBounds={appBounds} />
     </div>
   );
 }

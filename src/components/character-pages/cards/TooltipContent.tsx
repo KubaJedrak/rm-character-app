@@ -17,7 +17,7 @@ export const TooltipContent = ({episodeIDs, visible, left, top, name}: ContentPa
   const [tooltipData, setTooltipData] = useState<Array<SeasonObject>>([
     {season: "01", seasonalEpisodes: []}, {season: "02", seasonalEpisodes: []}, {season: "03", seasonalEpisodes: []}, {season: "04", seasonalEpisodes: []}, {season: "05", seasonalEpisodes: []}, {season: "06", seasonalEpisodes: []}
   ])
-  const [dataReady, setDataReady] = useState(false)
+  const [dataReady, setDataReady] = useState(false) 
   
   const fetchEpisodes = async() => {
     const response = await fetch(`https://rickandmortyapi.com/api/episode/${episodeIDs}`)
@@ -70,7 +70,6 @@ export const TooltipContent = ({episodeIDs, visible, left, top, name}: ContentPa
     fetchEpisodes()
     setDataReady(true)
   }, [])
-
 
   return(
     <div 
