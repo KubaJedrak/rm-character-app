@@ -4,7 +4,7 @@ import { TooltipContent } from "./TooltipContent"
 import './CharacterCard.css'
 
 type CharacterData = {
-  character: any,
+  character: any, 
   handleActiveCard: (isActive: boolean, listKey: number) => void,
   listKey: number,
   appBounds: any
@@ -58,12 +58,16 @@ export const CharacterCard = ({character, handleActiveCard, listKey, appBounds}:
       const maxWidthOfTooltip = 325
       const totalWidthWithTootltip = elementBounds.left + elementBounds.width + padding + maxWidthOfTooltip
 
-      if (totalWidthWithTootltip > appBounds.width) {
-        setPositionLeft(String(elementBounds.left + elementBounds.width + padding - maxWidthOfTooltip))
+      if (appBounds.width < 600) {
+        setPositionLeft(`${String(20)}%`)
+        setPositionTop(`${String(elementBounds.top + padding + 30)}px`)
+      } else if (totalWidthWithTootltip > appBounds.width) {
+        setPositionLeft(`${String(elementBounds.left + elementBounds.width + padding - maxWidthOfTooltip)}px`)
+        setPositionTop(`${String(elementBounds.top + padding)}px`)
       } else {
-        setPositionLeft(String(elementBounds.left + elementBounds.width + padding))
+        setPositionLeft(`${String(elementBounds.left + elementBounds.width + padding)}px`)
+        setPositionTop(`${String(elementBounds.top + padding)}px`)
       }
-      setPositionTop(String(elementBounds.top + padding))
     }
   }
 
@@ -114,9 +118,8 @@ export const CharacterCard = ({character, handleActiveCard, listKey, appBounds}:
           <TooltipContent 
             episodeIDs={episodeIDs}
             visible={isTooltipVisible} 
-            top={`${positionTop}px`}
-            left={`${positionLeft}px`}
-            name={name}
+            top={`${positionTop}`}
+            left={`${positionLeft}`}
           />, document.body, id)}
         </div>
       </div>

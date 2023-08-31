@@ -82,3 +82,9 @@
   font-size: 12px;
   margin-left: 10px;
 }
+
+@media screen and (max-width: 600px) {
+  .tooltip--container {
+    max-width: 10%;
+  }
+}

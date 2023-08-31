@@ -5,7 +5,7 @@ import { CharacterSearch } from "../character-search/CharacterSearch"
 import './CharacterPages.css'
 
 type AppBounds = {
-  appBounds: any        
+  appBounds: any
 }
 
 export const CharacterPages = ({appBounds}: AppBounds) => {

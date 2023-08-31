@@ -6,12 +6,11 @@ type ContentParams = {
   visible: boolean,
   top: string,
   left: string,
-  name?: string
 }
 
 type SeasonObject = {season: string, seasonalEpisodes: string[]}
 
-export const TooltipContent = ({episodeIDs, visible, left, top, name}: ContentParams) => {
+export const TooltipContent = ({episodeIDs, visible, left, top}: ContentParams) => {
 
   const [error, setError] = useState<any>(null)
   const [tooltipData, setTooltipData] = useState<Array<SeasonObject>>([
@@ -52,7 +51,7 @@ export const TooltipContent = ({episodeIDs, visible, left, top, name}: ContentPa
       
         tempArray.forEach( entry => {          
           if (entry.season === season) {            
-            if (!entry.seasonalEpisodes.includes(episodeNumber)) entry.seasonalEpisodes.push(episodeNumber) // why did it keep doubling it?!
+            if (!entry.seasonalEpisodes.includes(episodeNumber)) entry.seasonalEpisodes.push(episodeNumber) 
           }
         })
       }

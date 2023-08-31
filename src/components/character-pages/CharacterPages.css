@@ -35,8 +35,26 @@
 }
 
 .characters-page--buttons {
+  width: 80vw;
   padding: 0px 50px 50px;
   display: flex;
   justify-content: space-between;
-  max-width: 80vw;
+}
+
+@media screen and (max-width: 600px) {
+  .characters-list__item {
+    width: 45%;
+  }
+  
+  .characters-page--active-counter--text {
+    margin-right: 10px;
+  }
+  
+  .characters-page--active-counter--page-text {
+    margin-left: 10px;
+  }
+
+  .characters-page--buttons {
+    padding: 10px 0px;
+  }
 }
