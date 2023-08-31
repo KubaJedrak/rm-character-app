@@ -5,7 +5,7 @@ import { CharacterSearch } from "../character-search/CharacterSearch"
 import './CharacterPages.css'
 
 type AppBounds = {
-  appBounds: any
+  appBounds: any        
 }
 
 export const CharacterPages = ({appBounds}: AppBounds) => {
@@ -35,7 +35,7 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   }
 
   // --- Card Active State functions: ---
-  const updateActiveCardsFunc = (isActive: boolean, listKey: number): void => {     // some bug here on backing up??
+  const updateActiveCardsFunc = (isActive: boolean, listKey: number): void => {
     if (isActive) setActiveCards([...activeCards, listKey])
     if (!isActive) setActiveCards(activeCards.filter((card) => card !== listKey))  
   }

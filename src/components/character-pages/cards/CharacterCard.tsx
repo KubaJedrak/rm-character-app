@@ -55,10 +55,11 @@ export const CharacterCard = ({character, handleActiveCard, listKey, appBounds}:
     if (targetElement) {
       const elementBounds = targetElement.getBoundingClientRect()
       const padding = 20
-      const totalWidthWithTootltip = elementBounds.left + elementBounds.width + padding + 325
+      const maxWidthOfTooltip = 325
+      const totalWidthWithTootltip = elementBounds.left + elementBounds.width + padding + maxWidthOfTooltip
 
       if (totalWidthWithTootltip > appBounds.width) {
-        setPositionLeft(String(elementBounds.left + elementBounds.width + padding - 325)) // 325 is the max width of the tooltip
+        setPositionLeft(String(elementBounds.left + elementBounds.width + padding - maxWidthOfTooltip))
       } else {
         setPositionLeft(String(elementBounds.left + elementBounds.width + padding))
       }
