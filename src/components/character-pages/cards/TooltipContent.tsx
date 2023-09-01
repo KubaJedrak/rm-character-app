@@ -51,7 +51,7 @@ export const TooltipContent = ({episodeIDs, visible, left, top}: ContentParams) 
       
         tempArray.forEach( entry => {          
           if (entry.season === season) {            
-            if (!entry.seasonalEpisodes.includes(episodeNumber)) entry.seasonalEpisodes.push(episodeNumber) 
+            if (!entry.seasonalEpisodes.includes(episodeNumber)) entry.seasonalEpisodes.push(episodeNumber) // why did it keep doubling it?! 
           }
         })
       }

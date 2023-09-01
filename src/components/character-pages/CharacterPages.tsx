@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { PaginationButton } from "../buttons/PaginationButton"
 import { CharacterCard } from "./cards/CharacterCard"
 import { CharacterSearch } from "../character-search/CharacterSearch"
 import './CharacterPages.css'
 
 type AppBounds = {
-  appBounds: any
+  appBounds: DOMRect | null
 }
 
 export const CharacterPages = ({appBounds}: AppBounds) => {
@@ -19,7 +19,7 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   const [searchByNameValue, setSearchByNameValue] = useState<string>("")
   const [isSearchReady, setIsSearchReady] = useState(false)
   const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search))
-
+  
   // --- FUNCTIONS: ---  
 
   // --- Searchbar functions: ---
@@ -27,7 +27,7 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
     setSearchByNameValue(searchValue)
   }
 
-  const handleEnterKeyDown = (e: any): void => {
+  const handleEnterKeyDown = (e: { key: string }): void => {
     if (e.key === "Enter") {
       urlParams.set("name", searchByNameValue)
       setIsSearchReady(true)
@@ -35,10 +35,10 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   }
 
   // --- Card Active State functions: ---
-  const updateActiveCardsFunc = (isActive: boolean, listKey: number): void => {
-    if (isActive) setActiveCards([...activeCards, listKey])
+  const updateActiveCardsFunc = useCallback((isActive: boolean, listKey: number): void => {
+    if (isActive) setActiveCards([...activeCards, listKey])    
     if (!isActive) setActiveCards(activeCards.filter((card) => card !== listKey))  
-  }
+  }, [activeCards])
 
   const resetActiveCards = () => {
     setActiveCards([])
@@ -71,9 +71,10 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   }
 
   // --- Fetch function: ---
-  const fetchWithQuery = async(urlParams: any, shouldPageBeReset?: boolean) => {
+  const fetchWithQuery = async(urlParams: URLSearchParams, shouldPageBeReset?: boolean) => {
     if (shouldPageBeReset) {await urlParams.delete("page")}
     let url = `https://rickandmortyapi.com/api/character/?${urlParams}`
+        
     const response = await fetch(url)
     const data = await response.json()
 
@@ -96,14 +97,14 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
       setIsSearchReady(false)
       setSearchByNameValue("")
     }    
-  }, [isSearchReady])
+  }, [isSearchReady, urlParams])
 
   // --- First API call after website loads ---
   useEffect(() => {
     setCurrentPage(Number(urlParams.get("page")) || 1)
     fetchWithQuery(urlParams)
     setReady(true)    
-  }, [])
+  }, [urlParams])
 
   return(
     <div className="container characters-page--container">

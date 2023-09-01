@@ -56,7 +56,6 @@
 .tooltip {
   position: relative;
   display: inline-block;
-  /* continue THIS, too tired, need zzzzzs */
 }
 
 .tooltip--container {
@@ -85,6 +84,7 @@
 
 @media screen and (max-width: 600px) {
   .tooltip--container {
-    max-width: 10%;
+    /* no idea why this doesn't scale properly \/   */
+    max-width: 10%; 
   }
 }

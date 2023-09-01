@@ -4,7 +4,7 @@ import './App.css';
 
 function App() {
 
-  const [appBounds, setAppBounds] = useState<DOMRect>()
+  const [appBounds, setAppBounds] = useState<DOMRect | null>(null)
   const appRef = useRef<any>(null)
 
   useEffect(() => {
