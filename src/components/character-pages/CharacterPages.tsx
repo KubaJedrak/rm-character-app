@@ -44,18 +44,14 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
 
   // --- Card Active State functions: ---
   const updateActiveCardsFunc = useCallback((isActive: boolean, characterID: number): void => {
-    if (isActive) {
-      setActiveCards([...activeCards, characterID])
+    if (isActive) { 
+      if (!activeCards.includes(characterID)) setActiveCards([...activeCards, characterID]) // .includes prevents duplicate entries and incorrect increase of active cards counter after page change 
+      // setActiveCards([...activeCards, characterID])
     }    
     if (!isActive) {
       setActiveCards(activeCards.filter((card) => card !== characterID))
     }  
   }, [activeCards])
-
-  // const resetActiveCards = () => {
-  //   setActiveCards([])
-  //   setCharacters([])
-  // }
 
   // --- Pagination functions: ---
   const setNewPage = (page: string): void => {

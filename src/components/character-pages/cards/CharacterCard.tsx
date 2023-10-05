@@ -15,7 +15,7 @@ type EpisodeIDs = string[]
 
 export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBounds}: CharacterData) => {
 
-  const [isActive, setIsActive] = useState(false)
+  const [isActive, setIsActive] = useState(isCardActive)
   const [containerClass, setContainerClass] = useState("")
   const [isTooltipVisible, setIsTooltipVisible] = useState(false)
   const [episodeIDs, setEpisodeIDs] = useState<EpisodeIDs>([])
@@ -78,8 +78,10 @@ export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBou
   //   -- Card Active CSS trigger & Active Count (in Pages) update --
   useEffect( () => {
     if (isActive) {
+      console.log(isActive);
       handleActiveCard(isActive, character.id)
     } else {
+      console.log(isActive);
       handleActiveCard(isActive, character.id)
     }
   }, [isActive])
