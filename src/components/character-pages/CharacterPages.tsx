@@ -8,16 +8,24 @@ type AppBounds = {
   appBounds: DOMRect | null
 }
 
+interface Character {
+  id: number, 
+  image: string, 
+  name: string, 
+  status: string, 
+  episode: string | string[]
+}
+
 export const CharacterPages = ({appBounds}: AppBounds) => {
 
   const [currentPage, setCurrentPage] = useState<number>(1) // starts at 1
   const [activeCards, setActiveCards] = useState<number[]>([]) 
-  const [characters, setCharacters] = useState([])
+  const [characters, setCharacters] = useState<Character[]>([])
   const [nextPage, setNextPage] = useState<string>("")
-  const [ready, setReady] = useState(false)
-  const [error, setError] = useState("")
+  const [ready, setReady] = useState<boolean>(false)
+  const [error, setError] = useState<string>("")
   const [searchByNameValue, setSearchByNameValue] = useState<string>("")
-  const [isSearchReady, setIsSearchReady] = useState(false)
+  const [isSearchReady, setIsSearchReady] = useState<boolean>(false)
   const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search))
   
   // --- FUNCTIONS: ---  
@@ -35,15 +43,19 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   }
 
   // --- Card Active State functions: ---
-  const updateActiveCardsFunc = useCallback((isActive: boolean, listKey: number): void => {
-    if (isActive) setActiveCards([...activeCards, listKey])    
-    if (!isActive) setActiveCards(activeCards.filter((card) => card !== listKey))  
+  const updateActiveCardsFunc = useCallback((isActive: boolean, characterID: number): void => {
+    if (isActive) {
+      setActiveCards([...activeCards, characterID])
+    }    
+    if (!isActive) {
+      setActiveCards(activeCards.filter((card) => card !== characterID))
+    }  
   }, [activeCards])
 
-  const resetActiveCards = () => {
-    setActiveCards([])
-    setCharacters([])
-  }
+  // const resetActiveCards = () => {
+  //   setActiveCards([])
+  //   setCharacters([])
+  // }
 
   // --- Pagination functions: ---
   const setNewPage = (page: string): void => {
@@ -51,14 +63,14 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   }
  
   const turnPageBack = (): void => {
-    resetActiveCards()
+    setCharacters([])
     setNewPage(String(currentPage-1))   
     fetchWithQuery(urlParams)    
     if (currentPage > 1) setCurrentPage(currentPage-1) // prevents going to the end of the list from page 1
   }
 
   const turnPageNext = (): void => {
-    resetActiveCards()
+    setCharacters([])
     const regex = /page=(\d+)/;
     const match = nextPage.match(regex)
     if (match) {
@@ -72,7 +84,7 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
 
   // --- Fetch function: ---
   const fetchWithQuery = async(urlParams: URLSearchParams, shouldPageBeReset?: boolean) => {
-    if (shouldPageBeReset) {await urlParams.delete("page")}
+    if (shouldPageBeReset) {urlParams.delete("page")}
     let url = `https://rickandmortyapi.com/api/character/?${urlParams}`
         
     const response = await fetch(url)
@@ -91,7 +103,7 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   // --- Search Bar trigger effect: ---
   useEffect( () => {
     if (isSearchReady) {
-      resetActiveCards()
+      setCharacters([])
       fetchWithQuery(urlParams, true)
       setCurrentPage(Number(urlParams.get("page")) || 1)
       setIsSearchReady(false)
@@ -116,13 +128,15 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
         </div>
         <div className="characters-page">
           <ul className="characters-list">
-            {characters.map( (character, id) => {
+            {characters.map( (character, index) => {             
+              let isCardActive: boolean = (activeCards.includes(character.id) ? true : false)             
+
               return(
-                <li key={id} className="characters-list__item">
+                <li key={index} className="characters-list__item">
                   <CharacterCard 
                     character={character} 
                     handleActiveCard={updateActiveCardsFunc} 
-                    listKey={id}
+                    isCardActive={isCardActive}
                     appBounds={appBounds}
                   /> 
                 </li>

@@ -2,17 +2,18 @@ import { useEffect, useState, useRef, useCallback } from "react"
 import { createPortal } from 'react-dom';
 import { TooltipContent } from "./TooltipContent"
 import './CharacterCard.css'
+import { isCallChain } from "typescript";
 
 type CharacterData = {
-  character: any, // am I supposed to specify ALL the things that I receive from the API or at least specify the ones I need myself? Or is there some other way?
-  handleActiveCard: (isActive: boolean, listKey: number) => void,
-  listKey: number,
+  character: any,
+  handleActiveCard: (isActive: boolean, characterID: number) => void,
+  isCardActive: boolean,
   appBounds: DOMRect | null,
 }
 
 type EpisodeIDs = string[]
 
-export const CharacterCard = ({character, handleActiveCard, listKey, appBounds}: CharacterData) => {
+export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBounds}: CharacterData) => {
 
   const [isActive, setIsActive] = useState(false)
   const [containerClass, setContainerClass] = useState("")
@@ -22,7 +23,7 @@ export const CharacterCard = ({character, handleActiveCard, listKey, appBounds}:
   const [positionTop, setPositionTop] = useState<string>("")
   const {id, image, name, status, episode: episodes} = character
   const targetElementRef = useRef<any>(null)
-  const regex = /[a-zA-Z0-9._%+-]+\/(\d+)$/ 
+  const regex = /[a-zA-Z0-9._%+-]+\/(\d+)$/  
 
   episodes.forEach( (episode: string) => {
     const match = episode.match(regex)   
@@ -76,14 +77,18 @@ export const CharacterCard = ({character, handleActiveCard, listKey, appBounds}:
 
   //   -- Card Active CSS trigger & Active Count (in Pages) update --
   useEffect( () => {
-    if (isActive) { 
-      setContainerClass("card characters-page__card active")
-      handleActiveCard(isActive, listKey)
+    if (isActive) {
+      handleActiveCard(isActive, character.id)
     } else {
-      setContainerClass("card characters-page__card")
-      handleActiveCard(isActive, listKey)
+      handleActiveCard(isActive, character.id)
     }
-  }, [isActive, listKey])
+  }, [isActive])
+
+  // update active cards on pagination from activeCards array
+  useEffect(() => {
+    if (isCardActive) setContainerClass("card characters-page__card active")
+    if (!isCardActive) setContainerClass("card characters-page__card")
+  }, [isCardActive])
 
   //   -- Tooltip Positioning Effect --
   useEffect(() => {    
