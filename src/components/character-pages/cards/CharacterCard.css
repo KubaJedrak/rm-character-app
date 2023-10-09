@@ -61,8 +61,7 @@
 .tooltip--container {
   display: none;
   visibility: hidden;
-  min-width: 250px;
-  max-width: 325px;
+  width: 300px;
   padding: 20px;
   background-color: #212121;
   border-radius: 2px;
@@ -84,7 +83,6 @@
 
 @media screen and (max-width: 600px) {
   .tooltip--container {
-    /* no idea why this doesn't scale properly \/   */
-    max-width: 10%; 
+    max-width: 50%; 
   }
 }

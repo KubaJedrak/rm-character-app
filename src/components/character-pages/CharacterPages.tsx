@@ -34,8 +34,25 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   const [isTooltipVisible, setIsTooltipVisible] = useState<boolean>(false)
   const [positionLeft, setPositionLeft] = useState<string>("")
   const [positionTop, setPositionTop] = useState<string>("")
+
+  const [appWidth, setAppWidth] = useState<number>(0)
   
   // --- FUNCTIONS: ---  
+
+  const mouseMoveHandler = useCallback((event: { clientX: number; clientY: number; }) => {
+    let appWidth = 0
+    if (appBounds) appWidth = appBounds.width
+    let maxTooltipWidth = 300
+
+    if (appWidth < 600) {
+      setPositionLeft(`20%`)      
+    } else if (event.clientX + maxTooltipWidth > appWidth) {
+      setPositionLeft(`${event.clientX - maxTooltipWidth - 15}px`)
+    } else {
+      setPositionLeft(`${event.clientX + 15}px`)
+    }
+    setPositionTop(`${event.clientY + 15}px`)
+  }, [appBounds])
 
   // --- Searchbar functions: ---
   const handleUpdateSearchValue = (searchValue: string) => {
@@ -84,11 +101,9 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
     }    
   }
 
-  const getTooltipData = (episodes: string[], isVisible: boolean, positionLeft: string, positionTop: string) => {
+  const getTooltipData = (episodes: string[], isVisible: boolean) => {
     setEpisodesToFetch(episodes)
     setIsTooltipVisible(isVisible)
-    setPositionLeft(positionLeft)
-    setPositionTop(positionTop)
   }
 
   // --- Fetch function: ---
@@ -128,7 +143,11 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   }, [urlParams])
 
   useEffect(() => {
-        
+    window.addEventListener('mousemove', mouseMoveHandler)
+
+    return (() => {
+      window.removeEventListener('mousemove', mouseMoveHandler)
+    })    
   }, [isTooltipVisible])
 
   return(
@@ -150,7 +169,6 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
                     character={character} 
                     handleActiveCard={updateActiveCardsFunc} 
                     isCardActive={isCardActive}
-                    appBounds={appBounds}
                     tooltipDataFunc={getTooltipData}
                   /> 
                 </li>
@@ -170,8 +188,8 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
         <TooltipContent 
           episodeIDs={episodesToFetch}
           visible={isTooltipVisible} 
-          top={`${positionTop}`}
-          left={`${positionLeft}`}
+          top={positionTop}
+          left={positionLeft}
         />, document.body)}
     </div>
   )
