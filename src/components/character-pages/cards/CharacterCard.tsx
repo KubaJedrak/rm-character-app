@@ -1,24 +1,19 @@
 import { useEffect, useState, useRef, useCallback } from "react"
-import { createPortal } from 'react-dom';
-import { TooltipContent } from "./TooltipContent"
 import './CharacterCard.css'
-import { isCallChain } from "typescript";
 
 type CharacterData = {
   character: any,
   handleActiveCard: (isActive: boolean, characterID: number) => void,
   isCardActive: boolean,
   appBounds: DOMRect | null,
+  tooltipDataFunc: (episodes: string[], isVisible: boolean, positionLeft: string, positionTop: string) => void 
 }
 
-type EpisodeIDs = string[]
-
-export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBounds}: CharacterData) => {
+export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBounds, tooltipDataFunc}: CharacterData) => {
 
   const [isActive, setIsActive] = useState(isCardActive)
   const [containerClass, setContainerClass] = useState("")
-  const [isTooltipVisible, setIsTooltipVisible] = useState(false)
-  const [episodeIDs, setEpisodeIDs] = useState<EpisodeIDs>([])
+  const [episodeIDs, setEpisodeIDs] = useState<string[]>([])
   const [positionLeft, setPositionLeft] = useState<string>("")
   const [positionTop, setPositionTop] = useState<string>("")
   const {id, image, name, status, episode: episodes} = character
@@ -43,11 +38,11 @@ export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBou
 
   // --- Tooltip Funcs: ---
   const handleMouseOver = (): void => {
-    setIsTooltipVisible(true)
+    tooltipDataFunc(episodeIDs, true, positionLeft, positionTop)
   }
 
   const handleMouseOut = (): void => {
-    setIsTooltipVisible(false)
+    tooltipDataFunc([], false, "0", "0")
   }
   
   // --- Tooltip Positioning: ---
@@ -78,13 +73,11 @@ export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBou
   //   -- Card Active CSS trigger & Active Count (in Pages) update --
   useEffect( () => {
     if (isActive) {
-      console.log(isActive);
       handleActiveCard(isActive, character.id)
     } else {
-      console.log(isActive);
       handleActiveCard(isActive, character.id)
     }
-  }, [isActive])
+  }, [isActive, character.id])
 
   // update active cards on pagination from activeCards array
   useEffect(() => {
@@ -124,13 +117,6 @@ export const CharacterCard = ({character, handleActiveCard, isCardActive ,appBou
             onMouseOut={handleMouseOut}
             id={`card-${id}`}
           >{episodes.length}</p>
-          {createPortal(
-          <TooltipContent 
-            episodeIDs={episodeIDs}
-            visible={isTooltipVisible} 
-            top={`${positionTop}`}
-            left={`${positionLeft}`}
-          />, document.body, id)}
         </div>
       </div>
     </div>

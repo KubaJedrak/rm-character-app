@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './CharacterCard.css'
+import { LoaderCircular } from '../../loader/loader'
 
 type ContentParams = {
   episodeIDs: string[],
@@ -16,9 +17,10 @@ export const TooltipContent = ({episodeIDs, visible, left, top}: ContentParams) 
   const [tooltipData, setTooltipData] = useState<Array<SeasonObject>>([
     {season: "01", seasonalEpisodes: []}, {season: "02", seasonalEpisodes: []}, {season: "03", seasonalEpisodes: []}, {season: "04", seasonalEpisodes: []}, {season: "05", seasonalEpisodes: []}, {season: "06", seasonalEpisodes: []}
   ])
-  const [dataReady, setDataReady] = useState(false) 
+  const [dataReady, setDataReady] = useState<boolean>(false) 
   
   const fetchEpisodes = async() => {
+    setDataReady(false)
     const response = await fetch(`https://rickandmortyapi.com/api/episode/${episodeIDs}`)
     const data = await response.json()
 
@@ -88,6 +90,7 @@ export const TooltipContent = ({episodeIDs, visible, left, top}: ContentParams) 
         })}
         {error && <p>Sorry, couldn't access this information</p>}
       </>}
+      {!dataReady && <LoaderCircular />}
     </div>
   )
 }

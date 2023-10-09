@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react"
+import { createPortal } from 'react-dom';
 import { PaginationButton } from "../buttons/PaginationButton"
 import { CharacterCard } from "./cards/CharacterCard"
+import { TooltipContent } from "./cards/TooltipContent"
 import { CharacterSearch } from "../character-search/CharacterSearch"
 import './CharacterPages.css'
 
@@ -27,6 +29,11 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   const [searchByNameValue, setSearchByNameValue] = useState<string>("")
   const [isSearchReady, setIsSearchReady] = useState<boolean>(false)
   const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search))
+
+  const [episodesToFetch,setEpisodesToFetch] = useState<string[]>([])
+  const [isTooltipVisible, setIsTooltipVisible] = useState<boolean>(false)
+  const [positionLeft, setPositionLeft] = useState<string>("")
+  const [positionTop, setPositionTop] = useState<string>("")
   
   // --- FUNCTIONS: ---  
 
@@ -46,7 +53,6 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
   const updateActiveCardsFunc = useCallback((isActive: boolean, characterID: number): void => {
     if (isActive) { 
       if (!activeCards.includes(characterID)) setActiveCards([...activeCards, characterID]) // .includes prevents duplicate entries and incorrect increase of active cards counter after page change 
-      // setActiveCards([...activeCards, characterID])
     }    
     if (!isActive) {
       setActiveCards(activeCards.filter((card) => card !== characterID))
@@ -76,6 +82,13 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
         setCurrentPage(currentPage+1)
       } 
     }    
+  }
+
+  const getTooltipData = (episodes: string[], isVisible: boolean, positionLeft: string, positionTop: string) => {
+    setEpisodesToFetch(episodes)
+    setIsTooltipVisible(isVisible)
+    setPositionLeft(positionLeft)
+    setPositionTop(positionTop)
   }
 
   // --- Fetch function: ---
@@ -114,6 +127,10 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
     setReady(true)    
   }, [urlParams])
 
+  useEffect(() => {
+        
+  }, [isTooltipVisible])
+
   return(
     <div className="container characters-page--container">
       <CharacterSearch handleEnterKeyDown={handleEnterKeyDown} handleUpdateSearchValue={handleUpdateSearchValue} />
@@ -134,6 +151,7 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
                     handleActiveCard={updateActiveCardsFunc} 
                     isCardActive={isCardActive}
                     appBounds={appBounds}
+                    tooltipDataFunc={getTooltipData}
                   /> 
                 </li>
               )
@@ -147,7 +165,14 @@ export const CharacterPages = ({appBounds}: AppBounds) => {
       <div className="characters-page--buttons">
         <PaginationButton nextPage={false} handleClick={turnPageBack} />
         <PaginationButton nextPage={true} handleClick={turnPageNext} />
-      </div>  
+      </div>
+      {isTooltipVisible && createPortal(
+        <TooltipContent 
+          episodeIDs={episodesToFetch}
+          visible={isTooltipVisible} 
+          top={`${positionTop}`}
+          left={`${positionLeft}`}
+        />, document.body)}
     </div>
   )
 }
